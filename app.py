@@ -163,7 +163,17 @@ with col_result:
                         </div>
                     """, unsafe_allow_html=True)
                     
-                    #st.progress(score / 100)
+                    st.markdown(f"""
+                        <div style="width:100%; background:#1e293b; border-radius:10px; height:10px;">
+                        <div style="
+                        width:{score}%;
+                        background:linear-gradient(90deg,#22c55e,#4ade80);
+                        height:100%;
+                        border-radius:10px;">
+                        </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
                     st.markdown("---")
                     st.markdown(clean_report)
                     
@@ -184,4 +194,5 @@ with col_result:
         """, unsafe_allow_html=True)
 
 st.markdown("<div style='text-align:center; padding: 2rem; color: #475569; font-size: 0.8rem;'>ResumePro AI • 2025 •</div>", unsafe_allow_html=True)
+
 
