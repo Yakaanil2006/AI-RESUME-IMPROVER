@@ -96,7 +96,6 @@ def extract_text_from_pdf(uploaded_file):
 
 def get_ai_analysis(resume_text, job_desc):
     try:
-        # Stable versioning to avoid NotFound errors
         model = genai.GenerativeModel("gemini-3-flash-preview")
         prompt = f"""
         Analyze this resume against the job description. 
@@ -146,15 +145,11 @@ with col_result:
                 # Parse Score
                 score_match = re.search(r"MATCH_SCORE:\s*(\d+)", report)
                 score = int(score_match.group(1)) if score_match else 0
-                
-                # Clean report for display (remove the raw score tag)
                 clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", report)
                 clean_report = re.sub(r"/?100\s*", "", clean_report).strip()
 
                 with st.container(border=True):
                     st.markdown("<h3 style='text-align: center; margin-top:0;'>📊 Performance Report</h3>", unsafe_allow_html=True)
-                    
-                    # Circular Accuracy Badge
                     st.markdown(f"""
                         <div class="score-container">
                             <div class="score-badge">
@@ -186,7 +181,6 @@ with col_result:
                         mime="text/plain"
                     )
     else:
-        # Clean Placeholder
         st.markdown("""
             <div style="text-align: center; padding: 7rem 2rem; border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px;">
                 <h3 style="color: #475569;">Awaiting Data</h3>
@@ -195,6 +189,7 @@ with col_result:
         """, unsafe_allow_html=True)
 
 st.markdown("<div style='text-align:center; padding: 2rem; color: #475569; font-size: 0.8rem;'>ResumePro AI • 2025 •</div>", unsafe_allow_html=True)
+
 
 
 
