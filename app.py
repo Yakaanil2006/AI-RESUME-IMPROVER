@@ -2,113 +2,86 @@ import streamlit as st
 import fitz  # PyMuPDF
 import google.generativeai as genai
 import os
+import re
 
 # ------------------ CONFIGURATION ------------------
-API_KEY = os.getenv("GOOGLE_API_KEY")
+# Get your API key from https://aistudio.google.com/
+API_KEY = "YOUR_GEMINI_API_KEY"
 genai.configure(api_key=API_KEY)
 
 st.set_page_config(
-    page_title="AI Resume Improver",
-    page_icon="📝",
+    page_title="ResumePro AI 2025",
+    page_icon="💎",
     layout="wide"
 )
 
-# ------------------ STYLING ------------------
+# ------------------ VIBRANT GLASSMORPHIC CSS ------------------
 st.markdown("""
 <style>
+    /* Global Styles */
+    .stApp {
+        background: radial-gradient(circle at 20% 30%, #4f46e5 0%, transparent 40%),
+                    radial-gradient(circle at 80% 70%, #9333ea 0%, transparent 40%),
+                    #0f172a;
+        color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+    }
 
-/* ---------- GLOBAL ---------- */
-.stApp {
-    background-color: #f9fafb;
-    font-family: "Inter", "Segoe UI", sans-serif;
-    color: #111827;
-}
+    /* Glass Cards */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
 
-/* ---------- HERO ---------- */
-.hero {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    padding: 2.5rem;
-    border-radius: 16px;
-    text-align: center;
-    margin-bottom: 2.5rem;
-}
+    /* Hero Section */
+    .hero {
+        text-align: center;
+        padding: 4rem 0 2rem 0;
+    }
+    .hero h1 {
+        font-size: 4rem;
+        font-weight: 900;
+        background: linear-gradient(to right, #60a5fa, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
 
-.hero h1 {
-    font-size: 2.6rem;
-    font-weight: 700;
-    color: #1f2937;
-}
+    /* Button Styling */
+    .stButton > button {
+        background: linear-gradient(90deg, #6366f1, #a855f7) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.8rem 2rem !important;
+        font-weight: 700 !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(168, 85, 247, 0.4) !important;
+    }
 
-.hero p {
-    font-size: 1.1rem;
-    color: #4b5563;
-}
-
-/* ---------- CARDS ---------- */
-.card {
-    background: #ffffff;
-    padding: 2rem;
-    border-radius: 16px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-    margin-bottom: 1.5rem;
-}
-
-/* ---------- BUTTON ---------- */
-.stButton > button {
-    background-color: #1a73e8;
-    color: white;
-    border-radius: 12px;
-    height: 3.2em;
-    font-size: 1rem;
-    font-weight: 600;
-    border: none;
-}
-
-.stButton > button:hover {
-    background-color: #1558b0;
-}
-
-/* ---------- INPUTS ---------- */
-textarea,
-[data-testid="stFileUploader"] {
-    border-radius: 12px !important;
-    border: 1px solid #d1d5db !important;
-    background-color: #f9fafb;
-}
-
-/* ---------- STATUS COLORS ---------- */
-.stAlert-success {
-    background-color: #ecfdf5;
-    color: #065f46;
-}
-
-.stAlert-warning {
-    background-color: #fffbeb;
-    color: #92400e;
-}
-
-.stAlert-error {
-    background-color: #fef2f2;
-    color: #991b1b;
-}
-
-/* ---------- FOOTER ---------- */
-.footer {
-    text-align: center;
-    color: #6b7280;
-    font-size: 0.9rem;
-    margin-top: 3rem;
-}
-
+    /* Score Badge */
+    .score-badge {
+        font-size: 3rem;
+        font-weight: 800;
+        text-align: center;
+        color: #4ade80;
+        margin: 1rem 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
+# ------------------ CORE LOGIC ------------------
 
-# ------------------ FUNCTIONS ------------------
 def extract_text_from_pdf(uploaded_file):
-    """Extract text from uploaded PDF"""
+    """Extracts raw text from PDF bytes."""
     try:
         text = ""
         with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
@@ -119,97 +92,72 @@ def extract_text_from_pdf(uploaded_file):
         st.error(f"Error reading PDF: {e}")
         return None
 
-
 def get_ai_suggestions(resume_text, job_description):
-    """Gemini AI resume analysis"""
+    """Uses Gemini 3 Flash to generate improvements."""
+    # Using the latest Gemini 3 Flash Preview as of Dec 2025
     model = genai.GenerativeModel("gemini-3-flash-preview")
-
+    
     prompt = f"""
-You are an expert Resume Optimizer and ATS Specialist.
-
-TASK:
-Analyze the RESUME against the JOB DESCRIPTION (JD).
-
-RESUME:
-{resume_text}
-
-JOB DESCRIPTION:
-{job_description if job_description else "No JD provided. Give general professional improvements."}
-
-DELIVERABLES:
-1. MATCH SCORE (0–100%)
-2. MISSING KEYWORDS / SKILLS
-3. IMPROVED BULLET POINTS (3–5, STAR method)
-4. 5 STRONG ACTION VERBS
-"""
-
+    You are an expert Resume Optimizer. Analyze the Resume against the Job Description.
+    
+    RESUME: {resume_text}
+    JD: {job_description if job_description else "General Optimization"}
+    
+    Output in strictly this format:
+    MATCH_SCORE: [Number 0-100]
+    ANALYSIS: [Main Feedback]
+    IMPROVEMENTS: [Bulleted STAR points]
+    KEYWORDS: [List of missing skills]
+    """
+    
     try:
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        return f"⚠️ API Error: {str(e)}"
+        return f"API Error: {str(e)}"
 
-# ------------------ UI ------------------
+# ------------------ UI LAYOUT ------------------
 
-# Hero
-st.markdown("""
-<div class="hero">
-    <h1>📝 AI Resume Improver</h1>
-    <p>Optimize your resume for ATS • Increase interview calls • Powered by AI</p>
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="hero"><h1>ResumePro AI</h1><p>Master the ATS with PhD-level insights</p></div>', unsafe_allow_html=True)
 
-# Columns
-col1, col2 = st.columns([1, 1], gap="large")
+col_in, col_out = st.columns([1, 1.2], gap="large")
 
-# ------------------ LEFT CARD ------------------
-with col1:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown("### 📄 Upload Resume & Job Details")
-
-    uploaded_file = st.file_uploader(
-        "Upload your Resume (PDF only)",
-        type="pdf"
-    )
-
-    job_description = st.text_area(
-        "Paste Job Description (Highly Recommended)",
-        height=220,
-        placeholder="Example: Software Engineer role requiring Python, ML, AWS..."
-    )
-
-    analyze_button = st.button("🚀 Analyze Resume")
+with col_in:
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.subheader("📥 Input Data")
+    
+    uploaded_file = st.file_uploader("Upload Resume (PDF)", type="pdf")
+    job_desc = st.text_area("Job Description (Paste below)", height=250, placeholder="Target role details...")
+    
+    submit = st.button("✨ Analyze & Improve")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ------------------ RIGHT CARD ------------------
-with col2:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown("### 🤖 AI Analysis & ATS Suggestions")
-
-    if analyze_button:
+with col_out:
+    if submit:
         if uploaded_file:
-            with st.spinner("🔍 Analyzing resume with AI..."):
-                resume_text = extract_text_from_pdf(uploaded_file)
-
-                if resume_text:
-                    analysis = get_ai_suggestions(resume_text, job_description)
-                    st.markdown("---")
-                    st.markdown(analysis)
-                    st.success("✅ Analysis Complete!")
-                else:
-                    st.error("❌ Could not extract text. Scanned PDFs are not supported.")
+            with st.spinner("🚀 Gemini 3 is thinking..."):
+                raw_text = extract_text_from_pdf(uploaded_file)
+                if raw_text:
+                    result = get_ai_suggestions(raw_text, job_desc)
+                    
+                    # Simple regex to find the score for visualization
+                    score_match = re.search(r"MATCH_SCORE:\s*(\d+)", result)
+                    score = int(score_match.group(1)) if score_match else 0
+                    
+                    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+                    st.markdown("### 🎯 ATS Match Score")
+                    
+                    # Progress Bar Visualization
+                    st.progress(score / 100)
+                    st.markdown(f'<div class="score-badge">{score}%</div>', unsafe_allow_html=True)
+                    
+                    st.markdown("### 💡 AI Recommendations")
+                    st.write(result.split("MATCH_SCORE:")[0] if "MATCH_SCORE:" in result else result)
+                    st.markdown('</div>', unsafe_allow_html=True)
         else:
-            st.warning("📌 Please upload your resume first.")
+            st.warning("Please upload a resume first.")
     else:
-        st.info("Upload your resume and click **Analyze Resume** to see AI-powered insights.")
-
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('<div class="glass-card" style="text-align:center;"><h3>Ready to scan!</h3><p>Upload a file to see your results.</p></div>', unsafe_allow_html=True)
 
 # ------------------ FOOTER ------------------
-st.markdown("""
-<div class="footer">
-    Built with ❤️ using Streamlit
-    © 2025 AI Resume Improver
-</div>
-""", unsafe_allow_html=True)
-
+st.markdown('<div style="text-align:center; color:#64748b; padding:2rem;">Powered by Gemini 3 Flash • December 2025</div>', unsafe_allow_html=True)
