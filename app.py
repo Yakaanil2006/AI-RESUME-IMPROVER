@@ -148,7 +148,8 @@ with col_result:
                 score = int(score_match.group(1)) if score_match else 0
                 
                 # Clean report for display (remove the raw score tag)
-                clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", report).strip()
+                clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", report)
+                clean_report = re.sub(r"/?100\s*", "", clean_report).strip()
 
                 with st.container(border=True):
                     st.markdown("<h3 style='text-align: center; margin-top:0;'>📊 Performance Report</h3>", unsafe_allow_html=True)
@@ -194,5 +195,6 @@ with col_result:
         """, unsafe_allow_html=True)
 
 st.markdown("<div style='text-align:center; padding: 2rem; color: #475569; font-size: 0.8rem;'>ResumePro AI • 2025 •</div>", unsafe_allow_html=True)
+
 
 
