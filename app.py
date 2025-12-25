@@ -1,11 +1,11 @@
 import streamlit as st
-import fitz
+import fitz  # PyMuPDF
 import google.generativeai as genai
 import os
 import re
 
 # ------------------ CONFIG ------------------
-API_KEY = os.getenv("GOOGLE_API_KEY")  # DO NOT hardcode in production
+API_KEY = os.getenv("GOOGLE_API_KEY")  # Set in Streamlit Secrets
 genai.configure(api_key=API_KEY)
 
 st.set_page_config(
@@ -14,83 +14,82 @@ st.set_page_config(
     layout="wide"
 )
 
-# ------------------ REFINED DARK GLASS UI ------------------
+# ------------------ CLEAN & USER-FRIENDLY UI ------------------
 st.markdown("""
 <style>
 
 /* Global */
 .stApp {
-    background-color: #0b1020;
-    color: #f8fafc;
+    background-color: #0f172a;
+    color: #e5e7eb;
     font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 /* Hero */
 .hero {
     text-align: center;
-    padding: 3rem 0 2rem 0;
+    padding: 2.5rem 0 2rem 0;
 }
 .hero h1 {
-    font-size: 3.4rem;
-    font-weight: 800;
+    font-size: 3rem;
+    font-weight: 700;
     color: #f8fafc;
 }
 .hero p {
-    font-size: 1.1rem;
-    color: #94a3b8;
+    font-size: 1.05rem;
+    color: #9ca3af;
 }
 
-/* Glass Card */
-.glass-card {
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-    margin-bottom: 2rem;
+/* Card */
+.card {
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
 }
 
 /* Buttons */
 .stButton > button {
-    background-color: #3b82f6 !important;
+    background-color: #2563eb !important;
     color: white !important;
-    border-radius: 12px !important;
-    height: 3.2em !important;
+    border-radius: 10px !important;
+    height: 3em !important;
     font-weight: 600 !important;
     border: none !important;
 }
 .stButton > button:hover {
-    background-color: #2563eb !important;
+    background-color: #1d4ed8 !important;
 }
 
 /* Inputs */
 textarea,
 [data-testid="stFileUploader"] {
-    background-color: rgba(255,255,255,0.05) !important;
-    color: #f8fafc !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
+    background-color: #020617 !important;
+    color: #e5e7eb !important;
+    border-radius: 10px !important;
+    border: 1px solid #1f2937 !important;
 }
 
 /* Score */
 .score {
-    font-size: 3rem;
-    font-weight: 800;
+    font-size: 2.6rem;
+    font-weight: 700;
     color: #22c55e;
     text-align: center;
     margin-top: 0.5rem;
 }
 
+/* Muted */
 .muted {
-    color: #94a3b8;
+    color: #9ca3af;
 }
 
 /* Footer */
 .footer {
     text-align: center;
-    color: #64748b;
-    padding: 2rem;
+    color: #6b7280;
+    padding: 2rem 0;
     font-size: 0.85rem;
 }
 
@@ -119,8 +118,9 @@ You are a professional ATS Resume Analyst.
 Return strictly in this format:
 
 MATCH_SCORE: <0-100>
+
 ANALYSIS:
-- Summary feedback
+- Short summary feedback
 
 IMPROVEMENTS:
 - STAR-based bullet points
@@ -140,34 +140,36 @@ JOB DESCRIPTION:
 
 # ------------------ UI ------------------
 
+# Hero
 st.markdown("""
 <div class="hero">
     <h1>ResumePro AI</h1>
-    <p>Clean. Professional. ATS-Optimized.</p>
+    <p>Check how well your resume matches a job description</p>
 </div>
 """, unsafe_allow_html=True)
 
 col_l, col_r = st.columns([1, 1.2], gap="large")
 
-# -------- LEFT COLUMN (ALWAYS VISIBLE) --------
+# -------- LEFT COLUMN (INPUT) --------
 with col_l:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.subheader("📄 Upload Resume")
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.subheader("📄 Upload Your Resume")
+    st.caption("PDF format only • No data is stored")
 
-    uploaded_file = st.file_uploader("PDF Resume", type="pdf")
+    uploaded_file = st.file_uploader("Resume (PDF)", type="pdf")
     job_desc = st.text_area(
-        "Job Description",
+        "Job Description (Optional but recommended)",
         height=220,
-        placeholder="Paste target role here..."
+        placeholder="Paste the job description here..."
     )
 
     run = st.button("Analyze Resume")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# -------- RIGHT COLUMN (ONLY WHEN RESULT EXISTS) --------
+# -------- RIGHT COLUMN (RESULT – ONLY WHEN READY) --------
 if run and uploaded_file:
     with col_r:
-        with st.spinner("Analyzing with Gemini AI..."):
+        with st.spinner("Analyzing your resume..."):
             resume_text = extract_text_from_pdf(uploaded_file)
 
             if resume_text:
@@ -176,18 +178,13 @@ if run and uploaded_file:
                 score_match = re.search(r"MATCH_SCORE:\s*(\d+)", result)
                 score = int(score_match.group(1)) if score_match else 0
 
-                # FULL RESULT CARD
-                st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-
-                st.subheader("🎯 ATS Match Score")
+                st.markdown('<div class="card">', unsafe_allow_html=True)
+                st.subheader("🎯 Resume Match Score")
                 st.progress(score / 100)
-                st.markdown(
-                    f"<div class='score'>{score}%</div>",
-                    unsafe_allow_html=True
-                )
+                st.markdown(f"<div class='score'>{score}%</div>", unsafe_allow_html=True)
 
                 st.markdown("---")
-                st.subheader("💡 AI Feedback")
+                st.subheader("💡 Improvement Suggestions")
                 st.markdown(result)
 
                 st.markdown('</div>', unsafe_allow_html=True)
@@ -195,10 +192,15 @@ if run and uploaded_file:
 elif run and not uploaded_file:
     st.warning("Please upload a resume first.")
 
+else:
+    st.markdown(
+        "<p class='muted' style='text-align:center;'>Upload your resume and click Analyze to see results</p>",
+        unsafe_allow_html=True
+    )
+
 # ------------------ FOOTER ------------------
 st.markdown("""
 <div class="footer">
     ResumePro AI • Built with Streamlit & Gemini
 </div>
 """, unsafe_allow_html=True)
-
