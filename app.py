@@ -100,7 +100,7 @@ def extract_text_from_pdf(uploaded_file):
         return None
 
 def get_ai_analysis(resume_text, job_desc):
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-3-flash-preview")
     prompt = f"Analyze this resume against the job description. Provide a MATCH_SCORE: (0-100) and then sections for Summary, Improvements (STAR method), and Missing Keywords. \nResume: {resume_text}\nJob: {job_desc}"
     response = model.generate_content(prompt)
     return response.text
@@ -157,3 +157,4 @@ with col_result:
                 <p style="color: #64748b;">Fill in the details on the left to unlock your insights.</p>
             </div>
         """, unsafe_allow_html=True)
+
