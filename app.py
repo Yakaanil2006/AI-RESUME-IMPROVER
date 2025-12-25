@@ -17,72 +17,94 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* App background */
+/* ---------- GLOBAL ---------- */
 .stApp {
-    background: linear-gradient(to right, #f8fafc, #eef2f7);
-    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9fafb;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    color: #111827;
 }
 
-/* Hero section */
+/* ---------- HERO ---------- */
 .hero {
-    background: linear-gradient(90deg, #2563eb, #4f46e5);
-    padding: 2.8rem;
-    border-radius: 18px;
-    color: white;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    padding: 2.5rem;
+    border-radius: 16px;
     text-align: center;
     margin-bottom: 2.5rem;
 }
 
 .hero h1 {
-    font-size: 2.7rem;
+    font-size: 2.6rem;
     font-weight: 700;
+    color: #1f2937;
 }
 
 .hero p {
-    font-size: 1.15rem;
-    opacity: 0.9;
+    font-size: 1.1rem;
+    color: #4b5563;
 }
 
-/* Card layout */
+/* ---------- CARDS ---------- */
 .card {
-    background: white;
+    background: #ffffff;
     padding: 2rem;
-    border-radius: 18px;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
     margin-bottom: 1.5rem;
 }
 
-/* Buttons */
+/* ---------- BUTTON ---------- */
 .stButton > button {
-    background: linear-gradient(90deg, #2563eb, #4f46e5);
+    background-color: #1a73e8;
     color: white;
-    border-radius: 14px;
-    height: 3.3em;
-    font-size: 1.05rem;
+    border-radius: 12px;
+    height: 3.2em;
+    font-size: 1rem;
     font-weight: 600;
-    transition: all 0.3s ease;
+    border: none;
 }
 
 .stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(79,70,229,0.4);
+    background-color: #1558b0;
 }
 
-/* Inputs */
-textarea, [data-testid="stFileUploader"] {
-    border-radius: 14px !important;
+/* ---------- INPUTS ---------- */
+textarea,
+[data-testid="stFileUploader"] {
+    border-radius: 12px !important;
+    border: 1px solid #d1d5db !important;
+    background-color: #f9fafb;
 }
 
-/* Footer */
+/* ---------- STATUS COLORS ---------- */
+.stAlert-success {
+    background-color: #ecfdf5;
+    color: #065f46;
+}
+
+.stAlert-warning {
+    background-color: #fffbeb;
+    color: #92400e;
+}
+
+.stAlert-error {
+    background-color: #fef2f2;
+    color: #991b1b;
+}
+
+/* ---------- FOOTER ---------- */
 .footer {
     text-align: center;
-    color: #64748b;
+    color: #6b7280;
     font-size: 0.9rem;
     margin-top: 3rem;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
 
 # ------------------ FUNCTIONS ------------------
 def extract_text_from_pdf(uploaded_file):
@@ -190,3 +212,4 @@ st.markdown("""
     © 2025 AI Resume Improver
 </div>
 """, unsafe_allow_html=True)
+
