@@ -3,7 +3,7 @@ import fitz
 import google.generativeai as genai
 import os
 
-API_KEY = "AIzaSyCi2R516faI1em_ElgydKvdZdjV3hi512I"
+API_KEY = os.getenv("GOOGLE_API_KEY")
 genai.configure(api_key=API_KEY)
 
 
@@ -97,4 +97,5 @@ with col2:
 
 # --- 4. FOOTER ---
 st.markdown("---")
+
 st.caption("Built with Streamlit")
