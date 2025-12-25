@@ -45,8 +45,8 @@ st.markdown("""
     background: #111827;
     border: 1px solid #1f2937;
     border-radius: 16px;
-    padding: 1.75rem;
-    margin-bottom: 1.5rem;
+    padding: 2.75rem;
+    margin-bottom: 2.5rem;
 }
 
 /* Buttons */
@@ -204,3 +204,4 @@ st.markdown("""
     ResumePro AI • Built with Streamlit & Gemini
 </div>
 """, unsafe_allow_html=True)
+
