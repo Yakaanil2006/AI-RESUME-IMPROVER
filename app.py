@@ -11,7 +11,7 @@ if API_KEY:
 
 st.set_page_config(
     page_title="ResumePro AI",
-    page_icon="💎",
+    page_icon="🧠",
     layout="wide"
 )
 
@@ -195,6 +195,7 @@ with col_result:
         """, unsafe_allow_html=True)
 
 st.markdown("<div style='text-align:center; padding: 2rem; color: #475569; font-size: 0.8rem;'>ResumePro AI • 2025 •</div>", unsafe_allow_html=True)
+
 
 
 
