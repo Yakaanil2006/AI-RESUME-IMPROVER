@@ -5,7 +5,7 @@ import os
 import re
 
 # ------------------ CONFIG ------------------
-# It's better to use st.secrets for Streamlit Cloud or .env locally
+# prioritize st.secrets for deployment, fallback to environment variables
 API_KEY = st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
 if API_KEY:
     genai.configure(api_key=API_KEY)
@@ -21,191 +21,199 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
-    /* Global Overrides */
+    /* Global Body Styling */
     .stApp {
         background: radial-gradient(circle at top left, #1e293b, #0f172a);
         color: #f1f5f9;
         font-family: 'Inter', sans-serif;
     }
 
-    /* Glassmorphism Card Effect */
+    /* Modern Glass Card */
     .custom-card {
-        background: rgba(30, 41, 59, 0.7);
-        backdrop-filter: blur(10px);
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 20px;
         padding: 2rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        margin-bottom: 2rem;
     }
 
-    /* Hero Section */
+    /* Hero Branding */
     .hero-container {
         text-align: center;
         padding: 3rem 0;
     }
     .hero-title {
-        font-size: 3.5rem;
+        font-size: 3.8rem;
         font-weight: 800;
-        background: linear-gradient(to right, #3b82f6, #2dd4bf);
+        letter-spacing: -1px;
+        background: linear-gradient(90deg, #3b82f6, #2dd4bf);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.2rem;
     }
     .hero-subtitle {
         color: #94a3b8;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+        font-weight: 300;
     }
 
-    /* Buttons */
+    /* Custom Button Design */
     .stButton > button {
         width: 100%;
         background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%) !important;
+        color: white !important;
         border: none !important;
-        padding: 0.75rem 1rem !important;
+        padding: 0.8rem !important;
         border-radius: 12px !important;
         font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         transition: all 0.3s ease !important;
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
     }
     .stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
     }
 
-    /* Score Display */
-    .score-circle {
-        background: rgba(34, 197, 94, 0.1);
+    /* Matching Score Badge */
+    .score-badge {
+        background: rgba(34, 197, 94, 0.15);
         border: 2px solid #22c55e;
         border-radius: 50%;
-        width: 120px;
-        height: 120px;
+        width: 110px;
+        height: 110px;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin: 0 auto;
-        font-size: 2.2rem;
-        font-weight: 800;
+        margin: 1.5rem auto;
         color: #22c55e;
     }
+    .score-val { font-size: 2rem; font-weight: 800; }
+    .score-lab { font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; }
 
-    /* Horizontal Rule */
-    hr {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        margin: 2rem 0;
-    }
-
-    /* Sidebar/Footer */
+    /* Clean Footer */
     .footer {
         text-align: center;
-        padding: 4rem 0 2rem;
-        color: #64748b;
-        font-size: 0.9rem;
+        padding: 3rem 0;
+        color: #475569;
+        font-size: 0.85rem;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------ LOGIC ------------------
+# ------------------ UTILITIES ------------------
 def extract_text_from_pdf(uploaded_file):
     try:
         text = ""
+        # stream=uploaded_file.read() reads the bytes from Streamlit uploader
         with fitz.open(stream=uploaded_file.read(), filetype="pdf") as doc:
             for page in doc:
                 text += page.get_text()
         return text
     except Exception as e:
-        st.error(f"Error reading PDF: {e}")
+        st.error(f"Error processing PDF: {e}")
         return None
 
-def get_ai_suggestions(resume_text, job_description):
-    model = genai.GenerativeModel("gemini-1.5-flash") # Updated to 1.5 Flash
+def get_ai_analysis(resume_text, job_description):
+    model = genai.GenerativeModel("gemini-1.5-flash")
     prompt = f"""
-    You are an expert ATS (Applicant Tracking System) consultant. 
-    Analyze the resume against the job description.
+    You are an expert ATS (Applicant Tracking System) and Career Coach.
+    Analyze the resume against the provided job description.
     
     Format the response exactly like this:
-    MATCH_SCORE: <number between 0-100>
-    
-    ### 📝 Executive Summary
-    <Short summary of alignment>
-    
-    ### 🚀 Top Improvements
-    <3-4 bullet points using STAR method>
-    
-    ### 🔑 Missing Keywords
-    <Comma separated list of keywords>
-    
+    MATCH_SCORE: <0-100>
+
+    ### 📝 Summary
+    <A brief professional overview of the match>
+
+    ### 🚀 Key Improvements
+    - Use STAR method (Situation, Task, Action, Result) for bullet points.
+    - Specific phrasing changes.
+
+    ### 🔑 Target Keywords
+    - Missing technical skills or industry terms.
+
     RESUME: {resume_text}
-    JOB DESCRIPTION: {job_description}
+    JOB DESCRIPTION: {job_description if job_description else "General professional improvement"}
     """
     response = model.generate_content(prompt)
     return response.text
 
 # ------------------ UI LAYOUT ------------------
 
-# Header
+# 1. Header Section
 st.markdown("""
 <div class="hero-container">
     <div class="hero-title">ResumePro AI</div>
-    <div class="hero-subtitle">Optimize your career path with Generative Intelligence</div>
+    <div class="hero-subtitle">Instant ATS Optimization & AI Insights</div>
 </div>
 """, unsafe_allow_html=True)
 
-# Main Body
-col1, col2 = st.columns([1, 1], gap="large")
+# 2. Main Interaction Area
+col_input, col_result = st.columns([1, 1], gap="large")
 
-with col1:
+with col_input:
+    # Opening the card container
     st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-    st.subheader("📤 Input Details")
+    st.markdown("<h3 style='margin-top:0;'>📤 Upload & Analyze</h3>", unsafe_allow_html=True)
     
-    uploaded_file = st.file_uploader("Upload Resume (PDF)", type="pdf", help="Your data is processed locally and never stored.")
+    resume_file = st.file_uploader("Upload your Resume (PDF)", type=["pdf"])
     
-    job_desc = st.text_area(
+    job_text = st.text_area(
         "Paste Job Description",
-        height=250,
-        placeholder="Copy and paste the job requirements here for a tailored analysis..."
+        height=280,
+        placeholder="Paste the target job description here for specific matching..."
     )
     
-    analyze_btn = st.button("Analyze Alignment")
+    analyze_click = st.button("Generate Report")
+    
+    # Closing the card container
     st.markdown('</div>', unsafe_allow_html=True)
 
-with col2:
-    if analyze_btn and uploaded_file:
-        with st.spinner("🧠 AI is analyzing your profile..."):
-            resume_text = extract_text_from_pdf(uploaded_file)
+with col_result:
+    if analyze_click and resume_file:
+        with st.spinner("⚡ Processing Analysis..."):
+            extracted_text = extract_text_from_pdf(resume_file)
             
-            if resume_text:
-                raw_result = get_ai_suggestions(resume_text, job_desc)
+            if extracted_text:
+                raw_analysis = get_ai_analysis(extracted_text, job_text)
                 
-                # Parsing Score
-                score_match = re.search(r"MATCH_SCORE:\s*(\d+)", raw_result)
-                score = int(score_match.group(1)) if score_match else 0
+                # Extract Score
+                score_match = re.search(r"MATCH_SCORE:\s*(\d+)", raw_analysis)
+                score_val = int(score_match.group(1)) if score_match else 0
                 
-                # Clean result text for display
-                display_text = re.sub(r"MATCH_SCORE:\s*\d+", "", raw_result).strip()
+                # Strip score from the display text
+                clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", raw_analysis).strip()
 
                 st.markdown('<div class="custom-card">', unsafe_allow_html=True)
-                st.markdown("<h3 style='text-align: center;'>Analysis Result</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='text-align: center; margin-top:0;'>📊 AI Analysis Report</h3>", unsafe_allow_html=True)
                 
-                # Visual Score Circle
+                # Score Badge Visualization
                 st.markdown(f"""
-                    <div class="score-circle">{score}%</div>
-                    <p style='text-align: center; color: #94a3b8; margin-top: 10px;'>Match Accuracy</p>
+                    <div class="score-badge">
+                        <span class="score-val">{score_val}%</span>
+                        <span class="score-lab">Match</span>
+                    </div>
                 """, unsafe_allow_html=True)
                 
-                st.progress(score / 100)
+                st.progress(score_val / 100)
                 
                 st.markdown("---")
-                st.markdown(display_text)
+                st.markdown(clean_report)
                 st.markdown('</div>', unsafe_allow_html=True)
     
-    elif not analyze_btn:
+    elif not analyze_click:
+        # Instruction State
         st.markdown("""
-            <div style="text-align: center; padding: 5rem 2rem; border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px;">
-                <h2 style="color: #475569;">Ready for Analysis</h2>
-                <p style="color: #64748b;">Fill in the details on the left to unlock your resume score and insights.</p>
+            <div style="text-align: center; padding: 6rem 2rem; border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px;">
+                <h3 style="color: #64748b;">Awaiting Input</h3>
+                <p style="color: #475569;">Upload your resume to receive AI-powered feedback and keyword analysis.</p>
             </div>
         """, unsafe_allow_html=True)
 
 # Footer
 st.markdown('<div class="footer">Built with Streamlit• Precision Recruitment Analysis</div>', unsafe_allow_html=True)
+
