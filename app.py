@@ -139,6 +139,7 @@ JOB DESCRIPTION:
     return response.text
 
 # ------------------ UI ------------------
+
 st.markdown("""
 <div class="hero">
     <h1>ResumePro AI</h1>
@@ -148,40 +149,51 @@ st.markdown("""
 
 col_l, col_r = st.columns([1, 1.2], gap="large")
 
+# -------- LEFT COLUMN (ALWAYS VISIBLE) --------
 with col_l:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader("📄 Upload Resume")
 
     uploaded_file = st.file_uploader("PDF Resume", type="pdf")
-    job_desc = st.text_area("Job Description", height=220, placeholder="Paste target role here...")
+    job_desc = st.text_area(
+        "Job Description",
+        height=220,
+        placeholder="Paste target role here..."
+    )
 
     run = st.button("Analyze Resume")
     st.markdown('</div>', unsafe_allow_html=True)
 
-with col_r:
-    if run and uploaded_file:
+# -------- RIGHT COLUMN (ONLY WHEN RESULT EXISTS) --------
+if run and uploaded_file:
+    with col_r:
         with st.spinner("Analyzing with Gemini AI..."):
-            text = extract_text_from_pdf(uploaded_file)
-            if text:
-                result = get_ai_suggestions(text, job_desc)
+            resume_text = extract_text_from_pdf(uploaded_file)
+
+            if resume_text:
+                result = get_ai_suggestions(resume_text, job_desc)
 
                 score_match = re.search(r"MATCH_SCORE:\s*(\d+)", result)
                 score = int(score_match.group(1)) if score_match else 0
 
+                # FULL RESULT CARD
                 st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+
                 st.subheader("🎯 ATS Match Score")
                 st.progress(score / 100)
-                st.markdown(f"<div class='score'>{score}%</div>", unsafe_allow_html=True)
+                st.markdown(
+                    f"<div class='score'>{score}%</div>",
+                    unsafe_allow_html=True
+                )
 
+                st.markdown("---")
                 st.subheader("💡 AI Feedback")
                 st.markdown(result)
+
                 st.markdown('</div>', unsafe_allow_html=True)
-    else:
-        st.markdown(
-            "<div class='glass-card' style='text-align:center;'>"
-            "<p class='muted'>Upload a resume to begin analysis.</p></div>",
-            unsafe_allow_html=True
-        )
+
+elif run and not uploaded_file:
+    st.warning("Please upload a resume first.")
 
 # ------------------ FOOTER ------------------
 st.markdown("""
@@ -189,3 +201,4 @@ st.markdown("""
     ResumePro AI • Built with Streamlit & Gemini
 </div>
 """, unsafe_allow_html=True)
+
