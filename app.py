@@ -116,7 +116,7 @@ def extract_text_from_pdf(uploaded_file):
 def get_ai_analysis(resume_text, job_desc):
     try:
         # Note: Ensure you have access to this specific model name
-        model = genai.GenerativeModel("gemini-2.5-flash-lite") 
+        model = genai.GenerativeModel("gemma-3-12b") 
         prompt = f"""
         Act as a recruiter. Analyze this resume against the JD. 
         Format your response exactly as:
@@ -141,7 +141,7 @@ def get_ai_analysis(resume_text, job_desc):
 
 # ------------------ APP INTERFACE ------------------
 
-st.markdown('<div class="hero-title">ResumePro AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title">ResumePro AI ✨</div>', unsafe_allow_html=True)
 st.markdown('<div class="hero-tagline">PRECISION CAREER OPTIMIZATION</div>', unsafe_allow_html=True)
 
 layout_left, layout_right = st.columns([1, 1.2], gap="large")
@@ -195,5 +195,6 @@ with layout_right:
         """, unsafe_allow_html=True)
 
 st.markdown("<div style='text-align:center; padding: 2rem; color: #475569; font-size: 0.8rem;'>ResumePro AI • 2025 •</div>", unsafe_allow_html=True)
+
 
 
