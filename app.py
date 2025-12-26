@@ -10,7 +10,7 @@ if API_KEY:
     genai.configure(api_key=API_KEY)
 
 st.set_page_config(
-    page_title="ResumePro AI | Glass Edition",
+    page_title="ResumeLens | Glass Edition",
     page_icon="🚀",
     layout="wide"
 )
@@ -37,6 +37,7 @@ st.markdown("""
     color: #f1f5f9;
 }
 
+/* Glass Containers */
 [data-testid="stVerticalBlockBorderWrapper"] {
     background: rgba(255,255,255,0.03);
     backdrop-filter: blur(12px) saturate(180%);
@@ -46,6 +47,7 @@ st.markdown("""
     box-shadow: 0 8px 32px rgba(0,0,0,0.35);
 }
 
+/* Logo */
 .logo-wrap {
     text-align: center;
 }
@@ -78,6 +80,7 @@ st.markdown("""
     margin-bottom: 3rem;
 }
 
+/* Cards */
 .glass-card {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.1);
@@ -92,6 +95,7 @@ st.markdown("""
     font-weight: 800;
 }
 
+/* Buttons */
 .stButton > button {
     background: rgba(99,102,241,0.25);
     border: 1px solid rgba(255,255,255,0.25);
@@ -99,12 +103,14 @@ st.markdown("""
     border-radius: 12px;
     padding: 0.6rem 2rem;
     font-weight: 600;
+    transition: 0.3s ease;
 }
 .stButton > button:hover {
     background: rgba(99,102,241,0.45);
     transform: translateY(-2px);
 }
 
+/* Inputs */
 .stTextArea textarea {
     background: rgba(0,0,0,0.25);
     border: 1px solid rgba(255,255,255,0.15);
@@ -159,7 +165,7 @@ st.markdown("""
     <span class="logo-text">ResumeLens</span>
     <span class="logo-badge">GLASS</span>
 </div>
-<div class="logo-subtitle">PRECISION CAREER OPTIMIZATION</div>
+<div class="logo-subtitle">SEE YOUR RESUME THROUGH A RECRUITER’S LENS</div>
 """, unsafe_allow_html=True)
 
 # ------------------ LAYOUT ------------------
@@ -171,7 +177,7 @@ with left:
     job_text = st.text_area("Job Description", height=260, placeholder="Paste job requirements...")
     analyze = st.button("Generate AI Audit", use_container_width=True)
 
-    # 🔔 Alerts
+    # Alerts
     if analyze:
         if not resume_file and not job_text.strip():
             st.toast("📄 Upload resume and paste job description", icon="⚠️")
@@ -182,7 +188,7 @@ with left:
 
 with right:
     if analyze and resume_file and job_text.strip():
-        with st.spinner("Refining glass optics..."):
+        with st.spinner("Refining insights..."):
             resume_text = extract_text_from_pdf(resume_file)
             if resume_text:
                 report = get_ai_analysis(resume_text, job_text)
@@ -212,7 +218,7 @@ with right:
                 st.download_button(
                     "Download Report (.md)",
                     clean_report,
-                    "Resume_Optimization.md",
+                    "ResumeLens_Report.md",
                     "text/markdown",
                     use_container_width=True
                 )
@@ -224,9 +230,9 @@ with right:
                     text-align:center;
                     background:rgba(255,255,255,0.02);">
             <div style="font-size:3rem;">💎</div>
-            <h4 style="color:#64748b;">Ready to Optimize</h4>
+            <h4 style="color:#64748b;">Ready to Analyze</h4>
             <p style="color:#475569;font-size:0.9rem;">
-                Upload your resume and job description to activate AI insights
+                Upload your resume and job description to begin
             </p>
         </div>
         """, unsafe_allow_html=True)
