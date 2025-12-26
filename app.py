@@ -10,7 +10,7 @@ if API_KEY:
     genai.configure(api_key=API_KEY)
 
 st.set_page_config(
-    page_title="ResumeLens |",
+    page_title="ResumeLens",
     page_icon="🚀",
     layout="wide"
 )
@@ -243,4 +243,5 @@ st.markdown(
     "</div>",
     unsafe_allow_html=True
 )
+
 
