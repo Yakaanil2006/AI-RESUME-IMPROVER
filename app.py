@@ -133,7 +133,7 @@ def extract_text_from_pdf(uploaded_file):
 
 def get_ai_analysis(resume_text, job_desc):
     try:
-        model = genai.GenerativeModel("gemma-3-12b")
+        model = genai.GenerativeModel("gemini-2.5-flash-lite")
         prompt = f"""
 Act as a recruiter. Analyze resume vs job description.
 
@@ -243,5 +243,6 @@ st.markdown(
     "</div>",
     unsafe_allow_html=True
 )
+
 
 
