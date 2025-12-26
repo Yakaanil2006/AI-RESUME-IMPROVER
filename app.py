@@ -1,5 +1,5 @@
 import streamlit as st
-import fitz
+import fitz  # PyMuPDF
 import google.generativeai as genai
 import os
 import re
@@ -37,7 +37,6 @@ st.markdown("""
     color: #f1f5f9;
 }
 
-/* Glass Containers */
 [data-testid="stVerticalBlockBorderWrapper"] {
     background: rgba(255,255,255,0.03);
     backdrop-filter: blur(12px) saturate(180%);
@@ -47,10 +46,7 @@ st.markdown("""
     box-shadow: 0 8px 32px rgba(0,0,0,0.35);
 }
 
-/* Logo */
-.logo-wrap {
-    text-align: center;
-}
+.logo-wrap { text-align: center; }
 .logo-text {
     font-size: 3.8rem;
     font-weight: 800;
@@ -59,17 +55,6 @@ st.markdown("""
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: glow 4s ease-in-out infinite;
-}
-.logo-badge {
-    margin-left: 8px;
-    padding: 6px 14px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: #a5b4fc;
-    border: 1px solid rgba(129,140,248,0.4);
-    border-radius: 999px;
-    background: rgba(99,102,241,0.15);
 }
 .logo-subtitle {
     text-align: center;
@@ -80,7 +65,6 @@ st.markdown("""
     margin-bottom: 3rem;
 }
 
-/* Cards */
 .glass-card {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.1);
@@ -90,12 +74,8 @@ st.markdown("""
     margin-bottom: 20px;
 }
 
-.score-text {
-    font-size: 4.5rem;
-    font-weight: 800;
-}
+.score-text { font-size: 4.5rem; font-weight: 800; }
 
-/* Buttons */
 .stButton > button {
     background: rgba(99,102,241,0.25);
     border: 1px solid rgba(255,255,255,0.25);
@@ -110,7 +90,6 @@ st.markdown("""
     transform: translateY(-2px);
 }
 
-/* Inputs */
 .stTextArea textarea {
     background: rgba(0,0,0,0.25);
     border: 1px solid rgba(255,255,255,0.15);
@@ -133,7 +112,7 @@ def extract_text_from_pdf(uploaded_file):
 
 def get_ai_analysis(resume_text, job_desc):
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        model = genai.GenerativeModel("gemma-3-12b")
         prompt = f"""
 Act as a recruiter. Analyze resume vs job description.
 
@@ -176,14 +155,9 @@ with left:
     job_text = st.text_area("Job Description", height=260, placeholder="Paste job requirements...")
     analyze = st.button("Generate AI Audit", use_container_width=True)
 
-    # Alerts
     if analyze:
-        if not resume_file and not job_text.strip():
-            st.toast("📄 Upload resume and paste job description", icon="⚠️")
-        elif not resume_file:
-            st.toast("📄 Please upload your resume (PDF)", icon="⚠️")
-        elif not job_text.strip():
-            st.toast("📝 Please paste the job description", icon="⚠️")
+        if not resume_file or not job_text.strip():
+            st.toast("📄 Please upload both a PDF and a Job Description", icon="⚠️")
 
 with right:
     if analyze and resume_file and job_text.strip():
@@ -192,60 +166,53 @@ with right:
             if resume_text:
                 report = get_ai_analysis(resume_text, job_text)
 
+                # Parse Score
                 score_match = re.search(r"MATCH_SCORE:\s*(\d+)", report)
                 score = int(score_match.group(1)) if score_match else 0
+                
+                # Clean report for display and download
                 clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", report).replace("---", "").strip()
-
+                
+                # Visuals
                 color = "#22c55e" if score > 75 else "#f59e0b" if score > 50 else "#ef4444"
 
                 st.markdown(f"""
                 <div class="glass-card">
-                    <div style="color:#94a3b8;font-size:0.85rem;font-weight:600;">
-                        MATCH ACCURACY
-                    </div>
+                    <div style="color:#94a3b8;font-size:0.85rem;font-weight:600;">MATCH ACCURACY</div>
                     <div class="score-text" style="color:{color};">{score}%</div>
-                    <div style="width:100%;height:12px;background:rgba(255,255,255,0.08);
-                                border-radius:20px;">
-                        <div style="width:{score}%;height:100%;background:{color};
-                                    border-radius:20px;box-shadow:0 0 16px {color}66;"></div>
+                    <div style="width:100%;height:12px;background:rgba(255,255,255,0.08);border-radius:20px;">
+                        <div style="width:{score}%;height:100%;background:{color};border-radius:20px;box-shadow:0 0 16px {color}66;"></div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
                 st.markdown(clean_report)
 
+                # TXT Download Logic
+                # Removes Markdown formatting symbols for a clean text file
+                txt_content = f"RESUMELENS ANALYSIS REPORT\n"
+                txt_content += f"Match Score: {score}%\n"
+                txt_content += "="*30 + "\n\n"
+                txt_content += clean_report.replace("### ", "").replace("💎 ", "").replace("🔥 ", "").replace("🛠️ ", "")
+
                 st.download_button(
-                    "Download Report (.md)",
-                    clean_report,
-                    "ResumeLens_Report.md",
-                    "text/markdown",
+                    label="Download Report (.txt)",
+                    data=txt_content,
+                    file_name="ResumeLens_Report.txt",
+                    mime="text/plain",
                     use_container_width=True
                 )
     else:
         st.markdown("""
-        <div style="border:1px dashed rgba(255,255,255,0.2);
-                    border-radius:24px;
-                    padding:5rem 2rem;
-                    text-align:center;
-                    background:rgba(255,255,255,0.02);">
+        <div style="border:1px dashed rgba(255,255,255,0.2);border-radius:24px;padding:5rem 2rem;text-align:center;background:rgba(255,255,255,0.02);">
             <div style="font-size:3rem;">💎</div>
             <h4 style="color:#64748b;">Ready to Analyze</h4>
-            <p style="color:#475569;font-size:0.9rem;">
-                Upload your resume and job description to begin
-            </p>
+            <p style="color:#475569;font-size:0.9rem;">Upload your resume and job description to begin</p>
         </div>
         """, unsafe_allow_html=True)
 
 # ------------------ FOOTER ------------------
 st.markdown(
-    "<div style='text-align:center;padding:2rem;color:#475569;font-size:0.75rem;'>"
-    "ResumeLens • 2025"
-    "</div>",
+    "<div style='text-align:center;padding:2rem;color:#475569;font-size:0.75rem;'>ResumeLens • 2025</div>",
     unsafe_allow_html=True
 )
-
-
-
-
-
-
