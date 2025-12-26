@@ -10,7 +10,7 @@ if API_KEY:
     genai.configure(api_key=API_KEY)
 
 st.set_page_config(
-    page_title="ResumeLens | Glass Edition",
+    page_title="ResumeLens |",
     page_icon="🚀",
     layout="wide"
 )
@@ -163,7 +163,6 @@ Job Description:
 st.markdown("""
 <div class="logo-wrap">
     <span class="logo-text">ResumeLens</span>
-    <span class="logo-badge">GLASS</span>
 </div>
 <div class="logo-subtitle">SEE YOUR RESUME THROUGH A RECRUITER’S LENS</div>
 """, unsafe_allow_html=True)
@@ -244,3 +243,4 @@ st.markdown(
     "</div>",
     unsafe_allow_html=True
 )
+
