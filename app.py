@@ -123,7 +123,7 @@ def extract_text_from_pdf(uploaded_file):
 
 def get_ai_analysis(resume_text, job_desc):
     try:
-        model = genai.GenerativeModel("gemma-3-12b")
+        model = genai.GenerativeModel("gemma-3-27b")
         prompt = f"""
         Role: Senior Recruiter
         Requirement: Analyze the resume against the JD.
@@ -206,5 +206,6 @@ with col_output:
 
 st.markdown("---")
 st.markdown("<div style='text-align:center; color: #334155; font-size: 0.8rem;'>RESUME PRO AI © 2025 •</div>", unsafe_allow_html=True)
+
 
 
