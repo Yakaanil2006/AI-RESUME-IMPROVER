@@ -1,5 +1,5 @@
 import streamlit as st
-import fitz  
+import fitz
 import google.generativeai as genai
 import os
 import re
@@ -37,9 +37,8 @@ st.markdown("""
     color: #f1f5f9;
 }
 
-/* Glass Container */
 [data-testid="stVerticalBlockBorderWrapper"] {
-    background: rgba(255,255,255,0.03) !important;
+    background: rgba(255,255,255,0.03);
     backdrop-filter: blur(12px) saturate(180%);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 24px;
@@ -47,10 +46,8 @@ st.markdown("""
     box-shadow: 0 8px 32px rgba(0,0,0,0.35);
 }
 
-/* Logo */
 .logo-wrap {
     text-align: center;
-    margin-bottom: 0.4rem;
 }
 .logo-text {
     font-size: 3.8rem;
@@ -62,7 +59,6 @@ st.markdown("""
     animation: glow 4s ease-in-out infinite;
 }
 .logo-badge {
-    display: inline-block;
     margin-left: 8px;
     padding: 6px 14px;
     font-size: 0.7rem;
@@ -72,7 +68,6 @@ st.markdown("""
     border: 1px solid rgba(129,140,248,0.4);
     border-radius: 999px;
     background: rgba(99,102,241,0.15);
-    backdrop-filter: blur(6px);
 }
 .logo-subtitle {
     text-align: center;
@@ -83,7 +78,6 @@ st.markdown("""
     margin-bottom: 3rem;
 }
 
-/* Cards */
 .glass-card {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.1);
@@ -96,26 +90,21 @@ st.markdown("""
 .score-text {
     font-size: 4.5rem;
     font-weight: 800;
-    line-height: 1;
 }
 
-/* Button */
 .stButton > button {
     background: rgba(99,102,241,0.25);
-    backdrop-filter: blur(6px);
     border: 1px solid rgba(255,255,255,0.25);
     color: white;
     border-radius: 12px;
     padding: 0.6rem 2rem;
     font-weight: 600;
-    transition: 0.3s ease;
 }
 .stButton > button:hover {
     background: rgba(99,102,241,0.45);
     transform: translateY(-2px);
 }
 
-/* Inputs */
 .stTextArea textarea {
     background: rgba(0,0,0,0.25);
     border: 1px solid rgba(255,255,255,0.15);
@@ -149,10 +138,10 @@ MATCH_SCORE: [0-100]
 Concise recruiter verdict.
 
 ### 🔥 Missing Critical Keywords
-Keywords present in JD but absent in resume.
+JD keywords absent in resume.
 
 ### 🛠️ Recommended Actions
-Clear steps to improve ATS score.
+Clear ATS optimization steps.
 
 Resume:
 {resume_text}
@@ -167,7 +156,7 @@ Job Description:
 # ------------------ HEADER ------------------
 st.markdown("""
 <div class="logo-wrap">
-    <span class="logo-text">ResumePro AI</span>
+    <span class="logo-text">ResumeLens</span>
     <span class="logo-badge">GLASS</span>
 </div>
 <div class="logo-subtitle">PRECISION CAREER OPTIMIZATION</div>
@@ -182,8 +171,17 @@ with left:
     job_text = st.text_area("Job Description", height=260, placeholder="Paste job requirements...")
     analyze = st.button("Generate AI Audit", use_container_width=True)
 
+    # 🔔 Alerts
+    if analyze:
+        if not resume_file and not job_text.strip():
+            st.toast("📄 Upload resume and paste job description", icon="⚠️")
+        elif not resume_file:
+            st.toast("📄 Please upload your resume (PDF)", icon="⚠️")
+        elif not job_text.strip():
+            st.toast("📝 Please paste the job description", icon="⚠️")
+
 with right:
-    if analyze and resume_file and job_text:
+    if analyze and resume_file and job_text.strip():
         with st.spinner("Refining glass optics..."):
             resume_text = extract_text_from_pdf(resume_file)
             if resume_text:
@@ -197,15 +195,14 @@ with right:
 
                 st.markdown(f"""
                 <div class="glass-card">
-                    <div style="color:#94a3b8;font-size:0.85rem;font-weight:600;letter-spacing:1px;">
+                    <div style="color:#94a3b8;font-size:0.85rem;font-weight:600;">
                         MATCH ACCURACY
                     </div>
                     <div class="score-text" style="color:{color};">{score}%</div>
                     <div style="width:100%;height:12px;background:rgba(255,255,255,0.08);
                                 border-radius:20px;">
                         <div style="width:{score}%;height:100%;background:{color};
-                                    border-radius:20px;box-shadow:0 0 16px {color}66;">
-                        </div>
+                                    border-radius:20px;box-shadow:0 0 16px {color}66;"></div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -237,7 +234,7 @@ with right:
 # ------------------ FOOTER ------------------
 st.markdown(
     "<div style='text-align:center;padding:2rem;color:#475569;font-size:0.75rem;'>"
-    "ResumePro AI • 2025"
+    "ResumeLens • 2025"
     "</div>",
     unsafe_allow_html=True
 )
