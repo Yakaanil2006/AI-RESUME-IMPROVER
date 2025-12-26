@@ -10,105 +10,104 @@ if API_KEY:
     genai.configure(api_key=API_KEY)
 
 st.set_page_config(
-    page_title="ResumePro AI | Premium Optimizer",
-    page_icon="✨",
+    page_title="ResumePro AI | Glass Edition",
+    page_icon="💎",
     layout="wide"
 )
 
-# ------------------ PREMIUM UI STYLING ------------------
+# ------------------ GLASSMORPHISM CSS ------------------
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
 
-    :root {
-        --primary: #6366f1;
-        --secondary: #a855f7;
-        --bg-dark: #0f172a;
-        --card-bg: rgba(30, 41, 59, 0.7);
-    }
-
+    /* Background Mesh Gradient */
     .stApp {
-        background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #0f172a 100%);
+        background-color: #0f172a;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+            radial-gradient(at 0% 100%, rgba(45, 212, 191, 0.1) 0px, transparent 50%);
         font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #f1f5f9;
     }
 
-    /* Glassmorphism Containers */
+    /* The Glass Effect Container */
     [data-testid="stVerticalBlockBorderWrapper"] {
-        background: var(--card-bg) !important;
-        backdrop-filter: blur(16px);
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(12px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         border-radius: 24px !important;
         padding: 2rem !important;
-        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
     }
 
-    /* Gradient Typography */
+    /* Hero Text */
     .hero-title {
-        font-size: 4rem;
+        font-size: 3.5rem;
         font-weight: 800;
-        letter-spacing: -2px;
-        background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+        background: linear-gradient(to right, #ffffff, #94a3b8);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        text-align: center;
         margin-bottom: 0;
     }
 
-    .hero-subtitle {
+    .hero-tagline {
+        text-align: center;
         color: #818cf8;
         font-weight: 600;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        font-size: 0.9rem;
-        margin-bottom: 2rem;
+        letter-spacing: 2px;
+        margin-bottom: 3rem;
+        font-size: 0.8rem;
     }
 
-    /* Score Ring Animation */
-    @keyframes precent {
-        0% { stroke-dashoffset: 300; }
-    }
-
-    .score-card {
-        background: rgba(255, 255, 255, 0.03);
+    /* Glass Score Card */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 20px;
-        padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 25px;
         text-align: center;
-        transition: transform 0.3s ease;
-    }
-    
-    .score-card:hover {
-        transform: translateY(-5px);
-        border-color: var(--primary);
+        margin-bottom: 20px;
     }
 
-    /* Button Overrides */
+    .score-text {
+        font-size: 4.5rem;
+        font-weight: 800;
+        line-height: 1;
+        margin: 10px 0;
+    }
+
+    /* Button Styling */
     .stButton > button {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
-        border: none !important;
-        padding: 0.75rem 2rem !important;
-        border-radius: 14px !important;
+        background: rgba(99, 102, 241, 0.2) !important;
+        backdrop-filter: blur(5px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 2rem !important;
         font-weight: 600 !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        transition: 0.4s all ease !important;
     }
 
     .stButton > button:hover {
-        transform: scale(1.02);
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        background: rgba(99, 102, 241, 0.4) !important;
+        border: 1px solid #818cf8 !important;
+        transform: translateY(-2px);
     }
 
-    /* Input Field Styling */
-    .stTextArea textarea, .stFileUploader section {
-        background-color: rgba(15, 23, 42, 0.5) !important;
-        border-radius: 12px !important;
+    /* Custom Input appearance */
+    .stTextArea textarea {
+        background: rgba(0, 0, 0, 0.2) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: white !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------ LOGIC ------------------
+# ------------------ HELPER FUNCTIONS ------------------
 def extract_text_from_pdf(uploaded_file):
     try:
         text = ""
@@ -117,82 +116,69 @@ def extract_text_from_pdf(uploaded_file):
                 text += page.get_text()
         return text
     except Exception as e:
-        st.error(f"Error extracting PDF: {e}")
+        st.error(f"Error reading PDF: {e}")
         return None
 
 def get_ai_analysis(resume_text, job_desc):
     try:
-        model = genai.GenerativeModel("gemma-3-27b") 
+        model = genai.GenerativeModel("gemini-2.5-flash-lite")
         prompt = f"""
-        Role: Expert ATS Resume Strategist
-        Task: Analyze the resume against the job description. 
-        Format your response exactly as follows:
+        Act as a recruiter. Analyze this resume against the JD. 
+        Format your response exactly as:
         MATCH_SCORE: [0-100]
         ---
-        ### 🎯 Match Insights
-        [Detailed summary]
+        ### 💎 Executive Summary
+        (Briefly state the fit)
         
-        ### 🚀 Key Improvements
-        [Actionable bullet points]
+        ### 🔥 Missing Critical Keywords
+        (List keywords found in JD but not resume)
         
-        ### 🔑 Missing Keywords
-        [Comma separated list]
-        
+        ### 🛠️ Recommended Actions
+        (Actionable bullets to increase score)
+
         Resume: {resume_text}
         Job Description: {job_desc}
         """
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        return f"MATCH_SCORE: 0\n\nAI Service Error: {str(e)}"
+        return f"MATCH_SCORE: 0\n\nError: {str(e)}"
 
-# ------------------ UI LAYOUT ------------------
+# ------------------ APP INTERFACE ------------------
 
-# Hero Section
-st.markdown("""
-<div style="text-align: center; padding: 3rem 0;">
-    <div class="hero-subtitle">AI-POWERED CAREER ACCELERATOR</div>
-    <div class="hero-title">ResumePro AI</div>
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="hero-title">ResumePro AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-tagline">PRECISION CAREER OPTIMIZATION</div>', unsafe_allow_html=True)
 
-col_input, col_result = st.columns([1, 1.3], gap="large")
+layout_left, layout_right = st.columns([1, 1.2], gap="large")
 
-with col_input:
-    st.markdown("### 🛠️ Configuration")
+with layout_left:
+    st.markdown("### 📥 Source Files")
     with st.container():
-        resume_file = st.file_uploader("Drop your resume here", type=["pdf"], help="PDF format only for optimal parsing")
-        
-        job_text = st.text_area(
-            "Target Role Requirements",
-            height=280,
-            placeholder="Paste the job description here to see how you rank..."
-        )
-        
-        analyze_btn = st.button("Analyze Alignment", use_container_width=True)
+        resume_file = st.file_uploader("Upload Resume", type=["pdf"])
+        job_text = st.text_area("Job Description", height=250, placeholder="Paste requirements...")
+        analyze_btn = st.button("Generate AI Audit", use_container_width=True)
 
-with col_result:
+with layout_right:
     if analyze_btn and resume_file and job_text:
-        with st.spinner("⚡ Calibrating Neural Matchers..."):
+        with st.spinner("Refining glass optics..."):
             text = extract_text_from_pdf(resume_file)
             if text:
                 report = get_ai_analysis(text, job_text)
                 
-                # Parsing
+                # Logic to parse the AI response
                 score_match = re.search(r"MATCH_SCORE:\s*(\d+)", report)
                 score = int(score_match.group(1)) if score_match else 0
-                clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", report).strip()
-                clean_report = clean_report.replace("---", "")
+                clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", report).replace("---", "").strip()
 
-                # Score Visualization
+                # Visualizing Score with Glassmorphism
+                color = "#22c55e" if score > 75 else "#f59e0b" if score > 50 else "#ef4444"
+                
                 st.markdown(f"""
-                <div class="score-card">
-                    <h2 style="margin:0; color: #94a3b8; font-size: 1rem;">COMPATIBILITY INDEX</h2>
-                    <div style="font-size: 4rem; font-weight: 800; color: { '#22c55e' if score > 75 else '#f59e0b' if score > 50 else '#ef4444' };">
-                        {score}<span style="font-size: 1.5rem;">%</span>
-                    </div>
-                    <div style="width:100%; background:rgba(255,255,255,0.1); height:8px; border-radius:10px; margin-top:10px;">
-                        <div style="width:{score}%; background:linear-gradient(90deg, #6366f1, #a855f7); height:100%; border-radius:10px;"></div>
+                <div class="glass-card">
+                    <span style="color: #94a3b8; font-size: 0.9rem; font-weight: 600; letter-spacing: 1px;">MATCH ACCURACY</span>
+                    <div class="score-text" style="color: {color};">{score}%</div>
+                    <div style="width:100%; background:rgba(255,255,255,0.05); height:12px; border-radius:20px;">
+                        <div style="width:{score}%; background:{color}; height:100%; border-radius:20px; box-shadow: 0 0 15px {color}66;"></div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -200,24 +186,26 @@ with col_result:
                 st.markdown(clean_report)
                 
                 st.download_button(
-                    label="💾 Export Optimization Strategy",
+                    label="Download Report (.md)",
                     data=clean_report,
-                    file_name="Optimization_Strategy.md",
+                    file_name="Resume_Optimization.md",
                     mime="text/markdown",
                     use_container_width=True
                 )
     else:
-        # Placeholder State
-        st.markdown("""
-        <div style="text-align: center; padding: 8rem 2rem; opacity: 0.5;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">🔬</div>
-            <h3 style="color: #94a3b8; font-weight: 400;">Ready for Analysis</h3>
-            <p>Upload your documents to unlock deep keyword insights and compatibility scores.</p>
+        # Default State
+        st.markdown(f"""
+        <div style="border: 1px dashed rgba(255,255,255,0.2); border-radius: 24px; padding: 5rem 2rem; text-align: center; background: rgba(255,255,255,0.01);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">💎</div>
+            <h4 style="color: #64748b;">Ready to Optimize</h4>
+            <p style="color: #475569; font-size: 0.9rem;">Upload your credentials to activate AI insights</p>
         </div>
         """, unsafe_allow_html=True)
 
+# Footer
 
 st.markdown("<div style='text-align:center; padding: 2rem; color: #475569; font-size: 1.5rem;'>ResumePro AI • 2025 •</div>", unsafe_allow_html=True)
+
 
 
 
