@@ -3,31 +3,24 @@ import fitz  # PyMuPDF
 import google.generativeai as genai
 import os
 import re
-from datetime import datetime
 
 # ------------------ CONFIG ------------------
 API_KEY = st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
-
 if API_KEY:
     genai.configure(api_key=API_KEY)
-else:
-    st.error("⚠️ Google API Key not found. Please set it in secrets.toml or environment variables.")
 
 st.set_page_config(
-    page_title="ResumePro AI | Career Dashboard",
+    page_title="ResumePro AI | Elite",
     page_icon="🚀",
     layout="wide"
 )
 
-# Initialize Session State for History
-if 'history' not in st.session_state:
-    st.session_state['history'] = []
-
-# ------------------ HIGH-VISIBILITY UI ------------------
+# ------------------ CLEAN & HIGH-VISIBILITY UI ------------------
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
 
+    /* Clean Dark Slate Background */
     .stApp {
         background: #0b0f1a;
         font-family: 'Inter', sans-serif;
@@ -44,6 +37,7 @@ st.markdown("""
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
     }
 
+    /* Modern Minimalist Header */
     .hero-title {
         font-size: 3rem;
         font-weight: 800;
@@ -59,15 +53,7 @@ st.markdown("""
         -webkit-text-fill-color: transparent;
     }
 
-    /* History Item Styling */
-    .history-item {
-        background: rgba(255,255,255,0.05);
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-left: 4px solid #6366f1;
-    }
-
+    /* Visible Card Effects */
     .glass-card {
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -75,6 +61,11 @@ st.markdown("""
         padding: 30px;
         text-align: center;
         margin-bottom: 25px;
+        transition: border 0.3s ease;
+    }
+    
+    .glass-card:hover {
+        border: 1px solid rgba(99, 102, 241, 0.5);
     }
 
     .score-text {
@@ -84,6 +75,7 @@ st.markdown("""
         text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
     }
 
+    /* Enhanced Button Visibility */
     .stButton > button {
         background: #6366f1 !important;
         color: white !important;
@@ -91,13 +83,28 @@ st.markdown("""
         border-radius: 10px !important;
         padding: 0.8rem 2rem !important;
         font-weight: 700 !important;
+        font-size: 1rem !important;
         width: 100%;
+        box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39) !important;
         transition: 0.3s all ease !important;
     }
 
     .stButton > button:hover {
         background: #4f46e5 !important;
         transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5) !important;
+    }
+
+    /* Input Focus Visibility */
+    .stTextArea textarea {
+        background: rgba(15, 23, 42, 0.9) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .stTextArea textarea:focus {
+        border-color: #6366f1 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -116,22 +123,21 @@ def extract_text_from_pdf(uploaded_file):
 
 def get_ai_analysis(resume_text, job_desc):
     try:
-        # Using Gemini 1.5 Flash as the stable production model
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash") # Stable & Fast
         prompt = f"""
-        Role: Senior Recruiter & ATS Specialist
-        Task: Provide a detailed resume match analysis.
+        Role: Senior Recruiter
+        Requirement: Analyze the resume against the JD.
         Format response strictly as:
         MATCH_SCORE: [0-100]
         ---
         ### 📊 Match Breakdown
-        (Concise summary)
+        (Summarize candidate suitability)
         
         ### 🎯 Keyword Gaps
         (List missing technical and soft skills)
         
         ### 🚀 Optimization Steps
-        (Bullet points for the user)
+        (Bullet points to improve the resume)
 
         Resume: {resume_text}
         Job Description: {job_desc}
@@ -141,65 +147,27 @@ def get_ai_analysis(resume_text, job_desc):
     except Exception as e:
         return f"MATCH_SCORE: 0\n\nError: {str(e)}"
 
-# ------------------ SIDEBAR TRACKER ------------------
-with st.sidebar:
-    st.markdown("### 📋 Application Tracker")
-    st.markdown("---")
-    if not st.session_state['history']:
-        st.info("No applications analyzed yet.")
-    else:
-        for item in reversed(st.session_state['history']):
-            with st.container():
-                st.markdown(f"""
-                <div class="history-item">
-                    <small style="color: #94a3b8;">{item['date']}</small><br>
-                    <strong>{item['company']}</strong><br>
-                    <span style="color: #10b981;">Score: {item['score']}%</span>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button(f"View {item['company']}", key=item['id']):
-                    st.session_state['report'] = item['report']
-    
-    if st.button("Clear History"):
-        st.session_state['history'] = []
-        st.rerun()
-
 # ------------------ MAIN INTERFACE ------------------
 
 st.markdown('<div class="hero-title">ResumePro <span class="hero-accent">AI</span></div>', unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; color: #94a3b8; margin-bottom: 3rem;'>Enterprise-Grade ATS Compatibility Dashboard</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color: #94a3b8; margin-bottom: 3rem;'>Elite ATS Analysis & Keyword Optimization</p>", unsafe_allow_html=True)
 
 col_input, col_output = st.columns([1, 1.2], gap="large")
 
 with col_input:
     st.markdown("#### 🛠️ Analysis Input")
-    company_name = st.text_input("Company Name (Optional)", placeholder="e.g. Google, Meta...")
-    resume_file = st.file_uploader("Upload Resume (PDF)", type=["pdf"])
-    job_text = st.text_area("Target Job Description", height=250, placeholder="Paste job requirements here...")
+    resume_file = st.file_uploader("Upload Professional Resume (PDF)", type=["pdf"])
+    job_text = st.text_area("Target Job Description", height=300, placeholder="Paste the job requirements here...")
     
-    if st.button("Run Professional Audit"):
+    if st.button("Start Analysis"):
         if resume_file and job_text:
             with st.spinner("Analyzing alignment..."):
                 extracted_text = extract_text_from_pdf(resume_file)
                 if extracted_text:
                     report = get_ai_analysis(extracted_text, job_text)
-                    
-                    # Parsing for history
-                    score_match = re.search(r"MATCH_SCORE:\s*(\d+)", report)
-                    current_score = int(score_match.group(1)) if score_match else 0
-                    
-                    # Save to History
-                    app_entry = {
-                        "id": str(datetime.now().timestamp()),
-                        "company": company_name if company_name else "Unnamed Role",
-                        "score": current_score,
-                        "report": report,
-                        "date": datetime.now().strftime("%Y-%m-%d %H:%M")
-                    }
-                    st.session_state['history'].append(app_entry)
                     st.session_state['report'] = report
         else:
-            st.warning("Ensure both resume and JD are provided.")
+            st.warning("Please provide both a resume and a job description.")
 
 with col_output:
     if 'report' in st.session_state:
@@ -208,6 +176,7 @@ with col_output:
         score = int(score_match.group(1)) if score_match else 0
         clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", report).replace("---", "").strip()
 
+        # Score Visual
         color = "#10b981" if score > 75 else "#f59e0b" if score > 50 else "#ef4444"
         
         st.markdown(f"""
@@ -223,17 +192,17 @@ with col_output:
         st.markdown(clean_report)
         
         st.download_button(
-            label="💾 Download Full Report",
+            label="Export PDF-Ready Insights",
             data=clean_report,
             file_name="Resume_Optimization_Report.md",
-            mime="text/markdown",
-            use_container_width=True
+            mime="text/markdown"
         )
     else:
         st.markdown("""
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; border: 2px dashed rgba(255,255,255,0.05); border-radius: 20px;">
-            <p style="color: #475569; font-size: 1.1rem;">Awaiting analysis to generate insights...</p>
+            <p style="color: #475569; font-size: 1.1rem;">Awaiting your files to begin processing...</p>
         </div>
         """, unsafe_allow_html=True)
 
-st.markdown("<div style='text-align:center; padding: 2rem; color: #475569; font-size: 0.8rem;'>RESUMEPRO AI © 2025</div>", unsafe_allow_html=True)
+st.markdown("---")
+st.markdown("<div style='text-align:center; color: #334155; font-size: 0.8rem;'>RESUMEPRO AI © 2025 •</div>", unsafe_allow_html=True)
