@@ -10,104 +10,106 @@ if API_KEY:
     genai.configure(api_key=API_KEY)
 
 st.set_page_config(
-    page_title="ResumePro AI | Glass Edition",
-    page_icon="💎",
+    page_title="ResumePro AI | Elite",
+    page_icon="🚀",
     layout="wide"
 )
 
-# ------------------ GLASSMORPHISM CSS ------------------
+# ------------------ CLEAN & HIGH-VISIBILITY UI ------------------
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
 
-    /* Background Mesh Gradient */
+    /* Clean Dark Slate Background */
     .stApp {
-        background-color: #0f172a;
-        background-image: 
-            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
-            radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
-            radial-gradient(at 0% 100%, rgba(45, 212, 191, 0.1) 0px, transparent 50%);
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        color: #f1f5f9;
+        background: #0b0f1a;
+        font-family: 'Inter', sans-serif;
+        color: #e2e8f0;
     }
 
-    /* The Glass Effect Container */
+    /* High-Visibility Glass Container */
     [data-testid="stVerticalBlockBorderWrapper"] {
-        background: rgba(255, 255, 255, 0.03) !important;
-        backdrop-filter: blur(12px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 24px !important;
-        padding: 2rem !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+        background: rgba(23, 32, 53, 0.8) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 20px !important;
+        padding: 2.5rem !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
     }
 
-    /* Hero Text */
+    /* Modern Minimalist Header */
     .hero-title {
-        font-size: 3.5rem;
+        font-size: 3rem;
         font-weight: 800;
-        background: linear-gradient(to right, #ffffff, #94a3b8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        letter-spacing: -1px;
+        color: #ffffff;
         text-align: center;
         margin-bottom: 0;
     }
-
-    .hero-tagline {
-        text-align: center;
-        color: #818cf8;
-        font-weight: 600;
-        letter-spacing: 2px;
-        margin-bottom: 3rem;
-        font-size: 0.8rem;
+    
+    .hero-accent {
+        background: linear-gradient(90deg, #6366f1, #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
-    /* Glass Score Card */
+    /* Visible Card Effects */
     .glass-card {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 25px;
+        border-radius: 16px;
+        padding: 30px;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        transition: border 0.3s ease;
+    }
+    
+    .glass-card:hover {
+        border: 1px solid rgba(99, 102, 241, 0.5);
     }
 
     .score-text {
-        font-size: 4.5rem;
+        font-size: 5rem;
         font-weight: 800;
-        line-height: 1;
-        margin: 10px 0;
+        margin: 5px 0;
+        text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
     }
 
-    /* Button Styling */
+    /* Enhanced Button Visibility */
     .stButton > button {
-        background: rgba(99, 102, 241, 0.2) !important;
-        backdrop-filter: blur(5px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background: #6366f1 !important;
         color: white !important;
-        border-radius: 12px !important;
-        padding: 0.6rem 2rem !important;
-        font-weight: 600 !important;
-        transition: 0.4s all ease !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 0.8rem 2rem !important;
+        font-weight: 700 !important;
+        font-size: 1rem !important;
+        width: 100%;
+        box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39) !important;
+        transition: 0.3s all ease !important;
     }
 
     .stButton > button:hover {
-        background: rgba(99, 102, 241, 0.4) !important;
-        border: 1px solid #818cf8 !important;
-        transform: translateY(-2px);
+        background: #4f46e5 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5) !important;
     }
 
-    /* Custom Input appearance */
+    /* Input Focus Visibility */
     .stTextArea textarea {
-        background: rgba(0, 0, 0, 0.2) !important;
+        background: rgba(15, 23, 42, 0.9) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
+        color: #ffffff !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .stTextArea textarea:focus {
+        border-color: #6366f1 !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------ HELPER FUNCTIONS ------------------
+# ------------------ HELPERS ------------------
 def extract_text_from_pdf(uploaded_file):
     try:
         text = ""
@@ -121,20 +123,21 @@ def extract_text_from_pdf(uploaded_file):
 
 def get_ai_analysis(resume_text, job_desc):
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash-lite")
+        model = genai.GenerativeModel("gemini-1.5-flash-lite") # Stable & Fast
         prompt = f"""
-        Act as a recruiter. Analyze this resume against the JD. 
-        Format your response exactly as:
+        Role: Senior Recruiter
+        Requirement: Analyze the resume against the JD.
+        Format response strictly as:
         MATCH_SCORE: [0-100]
         ---
-        ### 💎 Executive Summary
-        (Briefly state the fit)
+        ### 📊 Match Breakdown
+        (Summarize candidate suitability)
         
-        ### 🔥 Missing Critical Keywords
-        (List keywords found in JD but not resume)
+        ### 🎯 Keyword Gaps
+        (List missing technical and soft skills)
         
-        ### 🛠️ Recommended Actions
-        (Actionable bullets to increase score)
+        ### 🚀 Optimization Steps
+        (Bullet points to improve the resume)
 
         Resume: {resume_text}
         Job Description: {job_desc}
@@ -144,74 +147,62 @@ def get_ai_analysis(resume_text, job_desc):
     except Exception as e:
         return f"MATCH_SCORE: 0\n\nError: {str(e)}"
 
-# ------------------ APP INTERFACE ------------------
+# ------------------ MAIN INTERFACE ------------------
 
-st.markdown('<div class="hero-title">ResumePro AI</div>', unsafe_allow_html=True)
-st.markdown('<div class="hero-tagline">PRECISION CAREER OPTIMIZATION</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title">ResumePro <span class="hero-accent">AI</span></div>', unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color: #94a3b8; margin-bottom: 3rem;'>Elite ATS Analysis & Keyword Optimization</p>", unsafe_allow_html=True)
 
-layout_left, layout_right = st.columns([1, 1.2], gap="large")
+col_input, col_output = st.columns([1, 1.2], gap="large")
 
-with layout_left:
-    st.markdown("### 📥 Source Files")
-    with st.container():
-        resume_file = st.file_uploader("Upload Resume", type=["pdf"])
-        job_text = st.text_area("Job Description", height=250, placeholder="Paste requirements...")
-        analyze_btn = st.button("Generate AI Audit", use_container_width=True)
+with col_input:
+    st.markdown("#### 🛠️ Analysis Input")
+    resume_file = st.file_uploader("Upload Professional Resume (PDF)", type=["pdf"])
+    job_text = st.text_area("Target Job Description", height=300, placeholder="Paste the job requirements here...")
+    
+    if st.button("Start Analysis"):
+        if resume_file and job_text:
+            with st.spinner("Analyzing alignment..."):
+                extracted_text = extract_text_from_pdf(resume_file)
+                if extracted_text:
+                    report = get_ai_analysis(extracted_text, job_text)
+                    st.session_state['report'] = report
+        else:
+            st.warning("Please provide both a resume and a job description.")
 
-with layout_right:
-    if analyze_btn and resume_file and job_text:
-        with st.spinner("Refining glass optics..."):
-            text = extract_text_from_pdf(resume_file)
-            if text:
-                report = get_ai_analysis(text, job_text)
-                
-                # Logic to parse the AI response
-                score_match = re.search(r"MATCH_SCORE:\s*(\d+)", report)
-                score = int(score_match.group(1)) if score_match else 0
-                clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", report).replace("---", "").strip()
+with col_output:
+    if 'report' in st.session_state:
+        report = st.session_state['report']
+        score_match = re.search(r"MATCH_SCORE:\s*(\d+)", report)
+        score = int(score_match.group(1)) if score_match else 0
+        clean_report = re.sub(r"MATCH_SCORE:\s*\d+", "", report).replace("---", "").strip()
 
-                # Visualizing Score with Glassmorphism
-                color = "#22c55e" if score > 75 else "#f59e0b" if score > 50 else "#ef4444"
-                
-                st.markdown(f"""
-                <div class="glass-card">
-                    <span style="color: #94a3b8; font-size: 0.9rem; font-weight: 600; letter-spacing: 1px;">MATCH ACCURACY</span>
-                    <div class="score-text" style="color: {color};">{score}%</div>
-                    <div style="width:100%; background:rgba(255,255,255,0.05); height:12px; border-radius:20px;">
-                        <div style="width:{score}%; background:{color}; height:100%; border-radius:20px; box-shadow: 0 0 15px {color}66;"></div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-                st.markdown(clean_report)
-                
-                st.download_button(
-                    label="Download Report (.md)",
-                    data=clean_report,
-                    file_name="Resume_Optimization.md",
-                    mime="text/markdown",
-                    use_container_width=True
-                )
-    else:
-        # Default State
+        # Score Visual
+        color = "#10b981" if score > 75 else "#f59e0b" if score > 50 else "#ef4444"
+        
         st.markdown(f"""
-        <div style="border: 1px dashed rgba(255,255,255,0.2); border-radius: 24px; padding: 5rem 2rem; text-align: center; background: rgba(255,255,255,0.01);">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">💎</div>
-            <h4 style="color: #64748b;">Ready to Optimize</h4>
-            <p style="color: #475569; font-size: 0.9rem;">Upload your credentials to activate AI insights</p>
+        <div class="glass-card">
+            <div style="color: #94a3b8; font-size: 0.8rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">Ats Compatibility</div>
+            <div class="score-text" style="color: {color};">{score}%</div>
+            <div style="width:100%; background:rgba(255,255,255,0.05); height:8px; border-radius:10px; overflow:hidden;">
+                <div style="width:{score}%; background:{color}; height:100%; border-radius:10px;"></div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-# Footer
+        st.markdown(clean_report)
+        
+        st.download_button(
+            label="Export PDF-Ready Insights",
+            data=clean_report,
+            file_name="Resume_Optimization_Report.md",
+            mime="text/markdown"
+        )
+    else:
+        st.markdown("""
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; border: 2px dashed rgba(255,255,255,0.05); border-radius: 20px;">
+            <p style="color: #475569; font-size: 1.1rem;">Awaiting your files to begin processing...</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-st.markdown("<div style='text-align:center; padding: 2rem; color: #475569; font-size: 1.5rem;'>ResumePro AI • 2025 •</div>", unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
+st.markdown("---")
+st.markdown("<div style='text-align:center; color: #334155; font-size: 0.8rem;'>RESUME PRO AI © 2025 •</div>", unsafe_allow_html=True)
