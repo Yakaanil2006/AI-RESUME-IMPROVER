@@ -96,7 +96,7 @@ def extract_text_from_pdf(uploaded_file):
 
 def get_ai_analysis(resume_text, job_desc):
     try:
-        model = genai.GenerativeModel("gemma-3-12b")
+        model = genai.GenerativeModel("gemma-3-12b"or"gemma-3-1b")
         prompt = f"""
         Analyze this resume against the job description. 
         Format your response starting exactly with 'MATCH_SCORE: [number]'. 
@@ -189,6 +189,7 @@ with col_result:
         """, unsafe_allow_html=True)
 
 st.markdown("<div style='text-align:center; padding: 2rem; color: #475569; font-size: 1.5rem;'>ResumePro AI • 2025 •</div>", unsafe_allow_html=True)
+
 
 
 
