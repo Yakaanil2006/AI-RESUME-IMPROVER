@@ -3,7 +3,8 @@
 ResumeLens is a high-performance, AI-powered ATS (Applicant Tracking System) resume optimizer that helps job seekers evaluate their resumes the way recruiters do.
 It leverages Google Gemini to deliver fast, actionable insights on resume–job description alignment.
 
-✨ Key Features
+# ✨ Key Features
+
 🎨 Modern Glassmorphic UI
 
 A sleek, dark-themed interface built with custom CSS for a premium and intuitive user experience.
@@ -32,7 +33,8 @@ Accurate text extraction from PDF resumes using PyMuPDF.
 
 Export your AI audit results as a clean .txt report for offline review and iteration.
 
-🛠️ Installation & Setup
+# 🛠️ Installation & Setup
+
 1️⃣ Prerequisites
 
 Python 3.9+
@@ -40,10 +42,13 @@ Python 3.9+
 Pip package manager
 
 2️⃣ Clone the Repository
+
 git clone https://github.com/yourusername/resumelens.git
+
 cd resumelens
 
 3️⃣ Install Dependencies
+
 pip install streamlit pymupdf google-generativeai
 
 4️⃣ Configure Google Gemini API Key
@@ -63,7 +68,7 @@ GOOGLE_API_KEY = "your_api_key_here"
 5️⃣ Run the Application
 streamlit run app.py
 
-📖 How to Use
+# 📖 How to Use
 
 Upload Resume – Upload your resume in PDF format
 
@@ -76,7 +81,11 @@ Review Results – Check match score, gaps, and summary
 Download Report – Use the insights to improve your resume
 
 📦 Project Structure
+
 ├── app.py              # Main Streamlit application
+
 ├── requirements.txt    # Project dependencies
+
 ├── .streamlit/         # Secrets & configuration (optional)
+
 └── README.md           # Documentation
