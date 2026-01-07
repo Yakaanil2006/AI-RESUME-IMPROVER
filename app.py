@@ -213,8 +213,10 @@ with right:
 
 # ------------------ FOOTER ------------------
 st.markdown(
-    "<div style='text-align:center;padding:2rem;color:#475569;font-size:0.75rem;'>ResumeLens • 2025</div>",
+    "<div style='text-align:center;padding:2rem;color:#475569;font-size:0.75rem;'>Team Ignite</div>
+    <div style='text-align:center;padding:2rem;color:#475569;font-size:0.75rem;'>ResumeLens • 2025</div>",
     unsafe_allow_html=True
 )
+
 
 
